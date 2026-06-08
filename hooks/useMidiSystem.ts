@@ -84,6 +84,36 @@ const sanitizeMidiConfigPatch = (value: unknown): Partial<MidiConfig> => {
     return patch;
 };
 
+const getMidiInputsList = (access: MIDIAccess | null): MIDIInput[] => {
+    if (!access || !access.inputs) return [];
+    
+    if (typeof access.inputs.values === 'function') {
+        try {
+            return Array.from(access.inputs.values());
+        } catch (_) {
+            // Ignore and fall through
+        }
+    }
+    
+    if (typeof access.inputs.forEach === 'function') {
+        const list: MIDIInput[] = [];
+        access.inputs.forEach((input: any) => {
+            if (input) list.push(input);
+        });
+        return list;
+    }
+    
+    if (Array.isArray(access.inputs)) {
+        return access.inputs;
+    }
+    
+    try {
+        return Array.from(access.inputs as any);
+    } catch (_) {
+        return [];
+    }
+};
+
 export const useMidiSystem = (
     params: SynthState,
     triggerPolyVoice: (idx: number, freq: number | null, mode: 'attack' | 'legato' | 'release', target: TriggerTarget) => void,
@@ -302,7 +332,7 @@ export const useMidiSystem = (
                      setActiveFreq2(null); 
                    } 
                  }
-            // Mono mode: fall back to the last held note, or release.
+             // Mono mode: fall back to the last held note, or release.
             } else if (activeMidiNotes.current) {
                  activeMidiNotes.current = activeMidiNotes.current.filter(n => n !== note);
                  
@@ -333,11 +363,18 @@ export const useMidiSystem = (
         if (!navigator.requestMIDIAccess) return;
         
         try {
-            const access = await navigator.requestMIDIAccess();
+            let access: MIDIAccess;
+            try {
+                // Request SysEx access first (common requirement on wrapper iOS browsers)
+                access = await navigator.requestMIDIAccess({ sysex: true });
+            } catch (_) {
+                // Fallback to basic access
+                access = await navigator.requestMIDIAccess();
+            }
             setMidiAccess(access);
             
             const updateInputList = () => { 
-              const inputs = Array.from(access.inputs.values()); 
+              const inputs = getMidiInputsList(access); 
               setMidiInputs(inputs); 
               return inputs; 
             };
@@ -382,7 +419,7 @@ export const useMidiSystem = (
         if (!midiAccess) return;
         return () => {
             midiAccess.onstatechange = null;
-            const inputs = Array.from(midiAccess.inputs.values()) as MIDIInput[];
+            const inputs = getMidiInputsList(midiAccess);
             inputs.forEach((input) => {
                 input.onmidimessage = null;
             });
