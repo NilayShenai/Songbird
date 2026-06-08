@@ -331,6 +331,9 @@ export const useSynth = (
   const startAudio = useCallback(async () => {
     if (ctxRef.current) return;
 
+    // Initialize MIDI immediately within the synchronous user gesture call stack
+    initMidi();
+
     // Apply AudioWorklet fallback patch explicitly to ensure connect/disconnect are intercepted
     installAudioWorkletPatch();
 
@@ -392,7 +395,6 @@ export const useSynth = (
               nodes.current.dryGain.gain.setTargetAtTime(0.12, t, 0.05);
 
               setIsStarted(true);
-              initMidi();
           }
       }, 200);
 
