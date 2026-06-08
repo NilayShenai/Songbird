@@ -63,12 +63,10 @@ const OscillatorPanel: React.FC<OscillatorPanelProps> = React.memo(({
       </div>
 
       <div className={`grid gap-4 mb-6 ${layoutMode === 'mobile' ? 'pt-4 border-t border-zinc-800' : ''}`}>
-        {!isControlsVisible && (
-          <div>
-            <Row><Label>{TEXTS.osc.freq}</Label><Value>{mapFreq(oscState.freq).toFixed(0)} Hz</Value></Row>
-            <Fader value={oscState.freq} onChange={v => updateOsc('freq', v)} />
-          </div>
-        )}
+        <div>
+          <Row><Label>{TEXTS.osc.freq}</Label><Value>{mapFreq(oscState.freq).toFixed(0)} Hz</Value></Row>
+          <Fader value={oscState.freq} onChange={v => updateOsc('freq', v)} />
+        </div>
         {isControlsVisible && (
           <div className="animate-in fade-in slide-in-from-top-1 duration-200">
             <Row><Label>{TEXTS.osc.octave}</Label><Value>{currentFootage}</Value></Row>
