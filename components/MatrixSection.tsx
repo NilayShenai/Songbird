@@ -60,11 +60,7 @@ const MatrixSection: React.FC<MatrixSectionProps> = React.memo(({
         setTargetValue(target, val);
     };
 
-    const allowedAssignTargets = ASSIGN_TARGET_VALUES.filter(target => {
-        if (target === 'osc1-pwm') return params.osc1.wave === 'square';
-        if (target === 'osc2-pwm') return params.osc2.wave === 'square';
-        return true;
-    });
+    const allowedAssignTargets = ASSIGN_TARGET_VALUES;
 
     const isMobile = layoutMode === 'mobile';
     return (

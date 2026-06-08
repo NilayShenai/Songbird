@@ -51,15 +51,14 @@ const OscillatorPanel: React.FC<OscillatorPanelProps> = React.memo(({
             </Button>
           ))}
         </ButtonGroup>
-        {isSequencerRunning ? (
-          <Button onClick={toggleSequencer} active animate className={isMobile ? '' : 'w-full text-center'}>{TEXTS.seq.title}</Button>
-        ) : (
+        <div className={`flex ${isMobile ? 'flex-row gap-2' : 'flex-col gap-2'} ${isMobile ? '' : 'w-full'}`}>
           <ButtonGroup className={isMobile ? '' : 'w-full justify-between'}>
-            {!hideMidiControl && <Button onClick={toggleMidi} active={oscState.midi} className={isMobile ? '' : 'flex-1 text-center'}>{TEXTS.osc.midi}</Button>}
+            <Button onClick={toggleMidi} active={oscState.midi} className={isMobile ? '' : 'flex-1 text-center'}>{TEXTS.osc.midi}</Button>
             <Button onClick={toggleVoltOct} active={oscState.voltOct} className={isMobile ? '' : 'flex-1 text-center'}>{TEXTS.osc.voltOct}</Button>
             <Button onClick={toggleDrone} active={oscState.drone} animate={oscState.drone} className={isMobile ? '' : 'flex-1 text-center'}>{TEXTS.osc.drone}</Button>
           </ButtonGroup>
-        )}
+          <Button onClick={toggleSequencer} active={isSequencerRunning} animate={isSequencerRunning} className={isMobile ? '' : 'w-full text-center'}>{TEXTS.seq.title}</Button>
+        </div>
       </div>
 
       <div className={`grid gap-4 mb-6 ${layoutMode === 'mobile' ? 'pt-4 border-t border-zinc-800' : ''}`}>
@@ -67,46 +66,37 @@ const OscillatorPanel: React.FC<OscillatorPanelProps> = React.memo(({
           <Row><Label>{TEXTS.osc.freq}</Label><Value>{mapFreq(oscState.freq).toFixed(0)} Hz</Value></Row>
           <Fader value={oscState.freq} onChange={v => updateOsc('freq', v)} />
         </div>
-        {isControlsVisible && (
-          <div className="animate-in fade-in slide-in-from-top-1 duration-200">
-            <Row><Label>{TEXTS.osc.octave}</Label><Value>{currentFootage}</Value></Row>
-            <ButtonGroup className="justify-between">
-              {OCTAVE_FOOTAGE.map(opt => (
-                  <Button key={opt.value} onClick={() => updateOsc('octave', opt.value)} active={oscState.octave === opt.value} className="flex-1">
-                      {opt.label}
-                  </Button>
-              ))}
-            </ButtonGroup>
-          </div>
-        )}
-        {isControlsVisible && (
-          <div className="animate-in fade-in slide-in-from-top-1 duration-200">
-            <Row><Label>{TEXTS.osc.fine}</Label><Value>{((oscState.fineTune - 512) / 5.12).toFixed(1)}%</Value></Row>
-            <Fader 
-                value={oscState.fineTune} 
-                onChange={v => {
-                    const snapped = Math.abs(v - 512) < 8 ? 512 : v;
-                    updateOsc('fineTune', snapped);
-                }} 
-            />
-          </div>
-        )}
-        {isControlsVisible && (
-          <div className="animate-in fade-in slide-in-from-top-1 duration-200">
-            <Row><Label>{TEXTS.osc.glide}</Label><Value>{mapPortamento(oscState.portamento).toFixed(2)} s</Value></Row>
-            <Fader value={oscState.portamento} onChange={v => updateOsc('portamento', v)} />
-          </div>
-        )}
-        
-        {oscState.wave === 'square' && (
-          <div className="animate-in fade-in slide-in-from-top-1 duration-200">
-            <Row>
-              <Label>{TEXTS.osc.width}</Label>
-              <Value>{calcPwmPercent(oscState.pwm)}%</Value>
-            </Row>
-            <Fader value={oscState.pwm} onChange={v => updateOsc('pwm', v)} />
-          </div>
-        )}
+        <div>
+          <Row><Label>{TEXTS.osc.octave}</Label><Value>{currentFootage}</Value></Row>
+          <ButtonGroup className="justify-between">
+            {OCTAVE_FOOTAGE.map(opt => (
+                <Button key={opt.value} onClick={() => updateOsc('octave', opt.value)} active={oscState.octave === opt.value} className="flex-1">
+                    {opt.label}
+                </Button>
+            ))}
+          </ButtonGroup>
+        </div>
+        <div>
+          <Row><Label>{TEXTS.osc.fine}</Label><Value>{((oscState.fineTune - 512) / 5.12).toFixed(1)}%</Value></Row>
+          <Fader 
+              value={oscState.fineTune} 
+              onChange={v => {
+                  const snapped = Math.abs(v - 512) < 8 ? 512 : v;
+                  updateOsc('fineTune', snapped);
+              }} 
+          />
+        </div>
+        <div>
+          <Row><Label>{TEXTS.osc.glide}</Label><Value>{mapPortamento(oscState.portamento).toFixed(2)} s</Value></Row>
+          <Fader value={oscState.portamento} onChange={v => updateOsc('portamento', v)} />
+        </div>
+        <div>
+          <Row>
+            <Label>{TEXTS.osc.width}</Label>
+            <Value>{calcPwmPercent(oscState.pwm)}%</Value>
+          </Row>
+          <Fader value={oscState.pwm} onChange={v => updateOsc('pwm', v)} />
+        </div>
       </div>
 
       <div className="pt-4 border-t border-zinc-800 mb-6 _b-widget">

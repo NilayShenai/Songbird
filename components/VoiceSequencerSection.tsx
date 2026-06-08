@@ -225,10 +225,13 @@ const SequencerPanel: React.FC<SequencerPanelProps> = React.memo(({
         <div className="flex justify-between items-center pb-2 border-b border-zinc-800 mb-0">
           <SubSectionTitle className="!mb-0">OSC {id === 1 ? 'A' : 'B'}</SubSectionTitle>
           {isMaster ? (
-            <div className={TYPO.PANEL_DESC}>{TEXTS.seq.master}</div>
+            <ButtonGroup>
+              <Button onClick={syncSequencers}>{TEXTS.seq.phaseRst}</Button>
+              <div className={`${TYPO.PANEL_DESC} flex items-center`}>{TEXTS.seq.master}</div>
+            </ButtonGroup>
           ) : (
             <ButtonGroup>
-              {params.seq2.isSynced && <Button onClick={syncSequencers}>{TEXTS.seq.phaseRst}</Button>}
+              <Button onClick={syncSequencers}>{TEXTS.seq.phaseRst}</Button>
               <Button onClick={() => updateSeq('isSynced', !state.isSynced)} active={state.isSynced}>{state.isSynced ? TEXTS.seq.linked : TEXTS.seq.unlinked}</Button>
             </ButtonGroup>
           )}
@@ -256,47 +259,35 @@ const SequencerPanel: React.FC<SequencerPanelProps> = React.memo(({
           </ButtonGroup>
         </div>
 
-        <div className="mt-auto">
-          {!isMaster && params.seq2.isSynced ? (
+        <div className="mt-auto flex flex-col gap-4">
             <div>
               <Row><Label>{TEXTS.seq.syncRatio}</Label></Row>
               <div className="grid grid-cols-3 gap-2">
                 {SYNC_RATIOS.map((r) => <Button key={r.value} onClick={() => updateSeq('syncRatio', r.value)} active={state.syncRatio === r.value}>{r.label}</Button>)}
               </div>
             </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-               {state.rateMode === 'free' ? (
-                   <div>
-                        <Row><Label>{TEXTS.seq.rate}</Label><Value>{mapSeqRate(state.rate).toFixed(2)} Hz</Value></Row>
-                        <Fader value={state.rate} onChange={v => updateSeq('rate', v)} />
-                        <ButtonGroup className="mt-2">
-                            <Button onClick={() => updateSeq('rateMode', 'free')} active className="flex-1">FREE</Button>
-                            <Button onClick={() => updateSeq('rateMode', 'sync')} className="flex-1">SYNC</Button>
-                        </ButtonGroup>
-                   </div>
-               ) : (
-                   <div className="flex flex-col gap-4">
-                       <div>
-                            <Row><Label>{TEXTS.delay.bpm}</Label><Value>{state.bpm}</Value></Row>
-                            <Fader min={30} max={300} value={state.bpm} onChange={v => updateSeq('bpm', v)} />
-                            <ButtonGroup className="mt-2">
-                                <Button onClick={() => updateSeq('rateMode', 'free')} className="flex-1">FREE</Button>
-                                <Button onClick={() => updateSeq('rateMode', 'sync')} active className="flex-1">SYNC</Button>
-                            </ButtonGroup>
-                       </div>
-                       <div>
-                           <Row><Label>{TEXTS.seq.div}</Label></Row>
-                           <Select 
-                                value={state.rateDivision} 
-                                onChange={v => updateSeq('rateDivision', v as DelayDivision)} 
-                                options={DELAY_DIVISIONS.map(d => ({ label: d.label, value: d.value }))}
-                           />
-                       </div>
-                   </div>
-               )}
+            <div className="pt-2 border-t border-zinc-800 flex flex-col gap-4">
+                 <div>
+                      <Row><Label>{TEXTS.seq.rate}</Label><Value>{mapSeqRate(state.rate).toFixed(2)} Hz</Value></Row>
+                      <Fader value={state.rate} onChange={v => updateSeq('rate', v)} />
+                 </div>
+                 <div>
+                      <Row><Label>{TEXTS.delay.bpm}</Label><Value>{state.bpm}</Value></Row>
+                      <Fader min={30} max={300} value={state.bpm} onChange={v => updateSeq('bpm', v)} />
+                 </div>
+                 <div>
+                      <Row><Label>{TEXTS.seq.div}</Label></Row>
+                      <Select 
+                           value={state.rateDivision} 
+                           onChange={v => updateSeq('rateDivision', v as DelayDivision)} 
+                           options={DELAY_DIVISIONS.map(d => ({ label: d.label, value: d.value }))}
+                      />
+                 </div>
+                 <ButtonGroup>
+                     <Button onClick={() => updateSeq('rateMode', 'free')} active={state.rateMode === 'free'} className="flex-1">FREE</Button>
+                     <Button onClick={() => updateSeq('rateMode', 'sync')} active={state.rateMode === 'sync'} className="flex-1">SYNC</Button>
+                 </ButtonGroup>
             </div>
-          )}
         </div>
       </div>
 

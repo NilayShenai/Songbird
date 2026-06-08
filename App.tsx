@@ -57,7 +57,7 @@ export const App: React.FC = () => {
   const [assignTargets, setAssignTargets] = useState<AssignTargets>(DEFAULT_ASSIGN_TARGETS);
   const [sensitivities, setSensitivities] = useState(DEFAULT_SENSITIVITIES);
   const [activeModal, setActiveModal] = useState<ActiveModal>('none');
-  const [showEQ, setShowEQ] = useState(false);
+
   const [showScreenWarning, setShowScreenWarning] = useState(false);
   const [showMisc, setShowMisc] = useState(false);
   const [appNotice, setAppNotice] = useState<string | null>(null);
@@ -838,7 +838,6 @@ export const App: React.FC = () => {
                   toggleDrone={toggleDrone}
                   toggleMidi={toggleMidi}
                   layoutMode="mobile"
-                  hideMidiControls
               />
           );
           break;
@@ -1294,31 +1293,30 @@ export const App: React.FC = () => {
                   </div>
               </div>
 
-              {/* Master Console Strip (Mixer/EQ & Tape Recorder side-by-side) */}
+              {/* Master Console Strip (Mixer, EQ & Tape Recorder side-by-side) */}
               <div className="flex-shrink-0 _b-panel border p-6 min-h-0 bg-black z-20">
                   <div className="grid grid-cols-12 gap-0 divide-x divide-zinc-800/80">
-                      {/* Mixer / EQ (cols 1-6) */}
-                      <div className="col-span-6 pr-6">
-                          {showEQ ? (
-                              <GraphicEQPanel
-                                  eqGains={params.global.eqGains || [512,512,512,512,512,512,512]}
-                                  updateGlobal={updateGlobal}
-                                  onClose={() => setShowEQ(false)}
-                              />
-                          ) : (
-                              <MixerPanel
-                                  global={params.global}
-                                  osc1={params.osc1}
-                                  osc2={params.osc2}
-                                  updateGlobal={updateGlobal}
-                                  updateOsc={updateOsc}
-                                  onOpenEQ={() => setShowEQ(true)}
-                              />
-                          )}
+                      {/* Mixer (cols 1-4) */}
+                      <div className="col-span-4 pr-6">
+                          <MixerPanel
+                              global={params.global}
+                              osc1={params.osc1}
+                              osc2={params.osc2}
+                              updateGlobal={updateGlobal}
+                              updateOsc={updateOsc}
+                          />
                       </div>
 
-                      {/* Tape Recorder (cols 7-12) */}
-                      <div className="col-span-6 pl-6">
+                      {/* EQ (cols 5-8) */}
+                      <div className="col-span-4 px-6">
+                          <GraphicEQPanel
+                              eqGains={params.global.eqGains || [512,512,512,512,512,512,512]}
+                              updateGlobal={updateGlobal}
+                          />
+                      </div>
+
+                      {/* Tape Recorder (cols 9-12) */}
+                      <div className="col-span-4 pl-6">
                           <RecorderPanel 
                               analyserNode={analyserNode} 
                               className="mb-0 h-[235px]" 

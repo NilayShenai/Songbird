@@ -70,18 +70,11 @@ const MatrixPad: React.FC<MatrixPadProps> = React.memo(({
 
     const renderOptions = useMemo(() => {
         return (currentValue: string) => {
-            const usedTargets = new Set<string>();
-            Object.values(allAssignTargets).forEach((val) => {
-                const p = val as AssignPadState;
-                if (p.x !== 'none') usedTargets.add(p.x);
-                if (p.y !== 'none') usedTargets.add(p.y);
-            });
-
             return (
                 <>
                     <option value="none" className="text-zinc-500 bg-black">NONE</option>
                     {TARGET_GROUPS.map(g => {
-                        const opts = allowedTargets.filter(t => g.check(t) && (!usedTargets.has(t) || t === currentValue));
+                        const opts = allowedTargets.filter(t => g.check(t));
                         if (opts.length === 0) return null;
                         return (
                             <optgroup key={g.label} label={g.label} className="font-bold text-zinc-500 bg-zinc-900">

@@ -15,8 +15,6 @@ interface LfoSectionProps {
 }
 
 const isPwmTargetAllowed = (target: LfoTarget, osc1Wave: Waveform, osc2Wave: Waveform): boolean => {
-  if (target === 'osc1-pwm') return osc1Wave === 'square';
-  if (target === 'osc2-pwm') return osc2Wave === 'square';
   return true;
 };
 
@@ -24,12 +22,7 @@ const LfoPanel: React.FC<LfoSectionProps> = React.memo(({ lfo1, lfo2, osc1Wave, 
   const isMobile = layoutMode === 'mobile';
 
   const renderTargetOptions = (id: 1 | 2) => {
-    const allowedTargets = LFO_TARGET_VALUES.filter(t => {
-        if (!isPwmTargetAllowed(t, osc1Wave, osc2Wave)) return false;
-        if (id === 1 && (t === 'lfo1-rate' || t === 'lfo1-depth')) return false;
-        if (id === 2 && (t === 'lfo2-rate' || t === 'lfo2-depth')) return false;
-        return true;
-    });
+    const allowedTargets = LFO_TARGET_VALUES;
 
     return (
         <>
@@ -73,30 +66,27 @@ const LfoPanel: React.FC<LfoSectionProps> = React.memo(({ lfo1, lfo2, osc1Wave, 
         </div>
 
         <div className={`${layoutMode === 'mobile' ? 'pt-4 border-t border-zinc-800 ' : ''}flex flex-col gap-4`}>
-            {state.rateMode === 'free' ? (
-                <div className="animate-in fade-in">
-                    <Row><Label>{TEXTS.lfo.rate}</Label><Value>{mapLfoRate(state.rate).toFixed(2)} Hz</Value></Row>
-                    <Fader value={state.rate} onChange={v => updateLfo(id, 'rate', v)} />
+            <div>
+                <Row><Label>{TEXTS.lfo.rate}</Label><Value>{mapLfoRate(state.rate).toFixed(2)} Hz</Value></Row>
+                <Fader value={state.rate} onChange={v => updateLfo(id, 'rate', v)} />
+            </div>
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-4'}`}>
+                <div>
+                    <Row><Label>{TEXTS.delay.bpm}</Label><Value>{state.bpm}</Value></Row>
+                    <Fader min={30} max={300} value={state.bpm} onChange={v => updateLfo(id, 'bpm', v)} />
                 </div>
-            ) : (
-                <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-4'} animate-in fade-in`}>
-                    <div>
-                        <Row><Label>{TEXTS.delay.bpm}</Label><Value>{state.bpm}</Value></Row>
-                        <Fader min={30} max={300} value={state.bpm} onChange={v => updateLfo(id, 'bpm', v)} />
+                <div className="flex gap-2 items-end">
+                    <div className="flex-grow">
+                        <Label className="block mb-1.5">{TEXTS.lfo.div}</Label>
+                        <Select 
+                            value={state.rateDivision} 
+                            onChange={v => updateLfo(id, 'rateDivision', v as DelayDivision)} 
+                            options={DELAY_DIVISIONS.map(d => ({ label: d.label, value: d.value }))}
+                        />
                     </div>
-                    <div className="flex gap-2 items-end">
-                        <div className="flex-grow">
-                            <Label className="block mb-1.5">{TEXTS.lfo.div}</Label>
-                            <Select 
-                                value={state.rateDivision} 
-                                onChange={v => updateLfo(id, 'rateDivision', v as DelayDivision)} 
-                                options={DELAY_DIVISIONS.map(d => ({ label: d.label, value: d.value }))}
-                            />
-                        </div>
-                        <Button onClick={() => onTapTempo(id)} className="h-[26px]">TAP</Button>
-                    </div>
+                    <Button onClick={() => onTapTempo(id)} className="h-[26px]">TAP</Button>
                 </div>
-            )}
+            </div>
 
             <div>
                 <Row><Label>{TEXTS.lfo.depth}</Label><Value>{Math.round(state.depth / 10.24)}%</Value></Row>
@@ -161,7 +151,7 @@ const CrossModPanel: React.FC<CrossModProps> = React.memo(({ oscMod, updateModPa
                             <Row><Label>{TEXTS.mod.amount}</Label><Value>{Math.round(oscMod.osc1to2.amount / 10.24)}%</Value></Row>
                             <Fader value={oscMod.osc1to2.amount} onChange={v => updateModPath('osc1to2', 'amount', v)} />
                         </div>
-                        <div className={`${oscMod.osc1to2.type !== 'fm' ? 'opacity-30 pointer-events-none' : ''}`}>
+                        <div>
                             <Row><Label>{TEXTS.mod.range}</Label><Value>{Math.round(mapFmDeviation(oscMod.osc1to2.range))} Hz</Value></Row>
                             <Fader value={oscMod.osc1to2.range} onChange={v => updateModPath('osc1to2', 'range', v)} />
                         </div>
@@ -182,7 +172,7 @@ const CrossModPanel: React.FC<CrossModProps> = React.memo(({ oscMod, updateModPa
                             <Row><Label>{TEXTS.mod.amount}</Label><Value>{Math.round(oscMod.osc2to1.amount / 10.24)}%</Value></Row>
                             <Fader value={oscMod.osc2to1.amount} onChange={v => updateModPath('osc2to1', 'amount', v)} />
                         </div>
-                        <div className={`${oscMod.osc2to1.type !== 'fm' ? 'opacity-30 pointer-events-none' : ''}`}>
+                        <div>
                             <Row><Label>{TEXTS.mod.range}</Label><Value>{Math.round(mapFmDeviation(oscMod.osc2to1.range))} Hz</Value></Row>
                             <Fader value={oscMod.osc2to1.range} onChange={v => updateModPath('osc2to1', 'range', v)} />
                         </div>

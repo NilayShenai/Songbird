@@ -187,20 +187,15 @@ const DelayPanel: React.FC<FxPanelProps & { onTapTempo: () => void, layoutMode?:
                 <Button onClick={() => updateGlobal('delayMode', 'free')} active={global.delayMode === 'free'}>FREE</Button>
                 <Button onClick={() => updateGlobal('delayMode', 'sync')} active={global.delayMode === 'sync'}>SYNC</Button>
             </ButtonGroup>
-            {global.delayMode === 'sync' && (
-                <div className="flex gap-2 w-full md:w-auto">
-                    <Select value={global.delayDivision} onChange={v => updateGlobal('delayDivision', v as DelayDivision)} options={DELAY_DIVISIONS.map(d => ({ label: d.label, value: d.value }))} className="w-24" />
-                    <Button onClick={onTapTempo}>{TEXTS.delay.tap}</Button>
-                </div>
-            )}
+            <div className="flex gap-2 w-full md:w-auto">
+                <Select value={global.delayDivision} onChange={v => updateGlobal('delayDivision', v as DelayDivision)} options={DELAY_DIVISIONS.map(d => ({ label: d.label, value: d.value }))} className="w-24" />
+                <Button onClick={onTapTempo}>{TEXTS.delay.tap}</Button>
+            </div>
         </div>
         <div className="pt-4 border-t border-zinc-800 md:pt-0 md:border-t-0">
-            <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 pb-6 ${!global.delayEnabled ? 'opacity-50' : ''} transition-opacity duration-200`}>
-                {global.delayMode === 'free' ? (
-                    <div><Row><Label>{TEXTS.delay.time}</Label><Value>{global.delayTime} ms</Value></Row><Fader value={global.delayTime} onChange={v => updateGlobal('delayTime', v)} /></div>
-                ) : (
-                    <div><Row><Label>{TEXTS.delay.bpm}</Label><Value>{global.bpm}</Value></Row><Fader min={30} max={300} value={global.bpm} onChange={v => updateGlobal('bpm', v)} /></div>
-                )}
+            <div className={`grid grid-cols-1 md:grid-cols-4 gap-6 pb-6 ${!global.delayEnabled ? 'opacity-50' : ''} transition-opacity duration-200`}>
+                <div><Row><Label>{TEXTS.delay.time}</Label><Value>{global.delayTime} ms</Value></Row><Fader value={global.delayTime} onChange={v => updateGlobal('delayTime', v)} /></div>
+                <div><Row><Label>{TEXTS.delay.bpm}</Label><Value>{global.bpm}</Value></Row><Fader min={30} max={300} value={global.bpm} onChange={v => updateGlobal('bpm', v)} /></div>
                 <div><Row><Label>{TEXTS.delay.feedback}</Label><Value>{Math.round(global.delayFeedback / 10.24)}%</Value></Row><Fader value={global.delayFeedback} onChange={v => updateGlobal('delayFeedback', v)} /></div>
                 <div><Row><Label>{TEXTS.delay.drywet}</Label><Value>{Math.round(global.delayMix / 10.24)}%</Value></Row><Fader value={global.delayMix} onChange={v => updateGlobal('delayMix', v)} /></div>
             </div>
